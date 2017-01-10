@@ -1,7 +1,18 @@
 (ns irresponsible.spectra
   (:require [#?(:clj clojure.core :cljs cljs.core) :as cc]
             [#?(:clj clojure.spec :cljs cljs.spec) :as s])
+  #?(:cljs
+     (:require-macros [irresponsible.spectra :refer [if-cljs spec-ns some-spec ns-keys ns-keys*]]))
   (:refer-clojure :exclude [instance?]))
+
+#?
+(:clj
+ (defmacro if-cljs
+   [then else]
+   (if (resolve 'cljs.core/str) then else)))
+ ;; (if (:ns &env) then else)) ;; no longer works, apparently :/
+
+(def spec-ns (if-cljs "cljs.spec" "clojure.spec"))
 
 (defmacro some-spec
   "Given a list of spec names, constructs an or using the specs as both names and values
@@ -13,7 +24,8 @@
   [& specs]
   (when-not (seq specs)
     (throw (ex-info "some-spec: expected at least one spec" {:got specs})))
-  `(s/or ~@(interleave specs specs)))
+  (let [name (symbol spec-ns "or")]
+    `(~name ~@(interleave specs specs))))
 
 (s/fdef some-spec
   :args (s/+ keyword?)
@@ -53,7 +65,19 @@
 (s/def ::req    ::kw-vec)
 (s/def ::opt-un ::kw-vec)
 (s/def ::opt    ::kw-vec)
-(s/def ::ns-keys-opts (s/keys* :opt-un [::req-un ::req ::opt-un ::opt]))
+;; (s/def ::ns-keys-opts (s/keys* :opt-un [::req-un ::req ::opt-un ::opt]))
+
+(defn keys-impl [ns spec-mac opts]
+  (letfn [(inner [s]
+            (if (namespace s)
+              s
+              (keyword (name ns) (name s))))
+          (outer [[k v]]
+            (let [v2 (if (= :gen k) v (mapv inner v))]
+              [k v2]))]
+    (let [v (select-keys opts [:req-un :req :opt-un :opt :gen])
+          name (symbol spec-ns spec-mac)]
+      `(~name ~@(mapcat outer (sort (seq v)))))))
 
 (defmacro ns-keys
   "Like {clojure,cljs}.spec/keys, except takes a namespace symbol whose name is
@@ -61,27 +85,33 @@
    it is ignored for convenience when using syntax-quote
    args: [ns & opts]
    returns: spec def"
-  [ns & opts]
-  (let [v (select-keys (conform! ::ns-keys-opts opts) [:req-un :req :opt-un :opt :gen])]
-    `(s/keys ~@(mapcat (fn [[k v]]
-                         [k (if (= :gen k) v (mapv #(if (namespace %) % (keyword (name ns) (name %))) v))])
-                       (sort (seq v))))))
+  [ns & {:keys [req-un req opt-un opt gen]}]
+  (->> (cond-> {}
+         gen    (assoc :gen gen)
+         req-un (assoc :req-un req-un)
+         req    (assoc :req req)
+         opt-un (assoc :opt-un opt-un)
+         opt    (assoc :opt opt))
+       (keys-impl ns "keys")))
 
-(s/fdef ns-keys
-  :args (s/cat :ns symbol? :opts ::ns-keys-opts))
+;; (s/fdef ns-keys
+;;   :args (s/cat :ns symbol? :opts ::ns-keys-opts))
 
 (defmacro ns-keys*
   "Like ns-keys, but returns a regex spec
    args: [ns & opts]
    returns: spec def"
-  [ns & opts]
-  (let [v (select-keys (conform! ::ns-keys-opts opts) [:req-un :req :opt-un :opt :gen])]
-    `(s/keys* ~@(mapcat (fn [[k v]]
-                         [k (if (= :gen k) v (mapv #(if (namespace %) % (keyword (name ns) (name %))) v))])
-                       (sort (seq v))))))
+  [ns & {:keys [req-un req opt-un opt gen]}]
+  (->> (cond-> {}
+         gen    (assoc :gen gen)
+         req-un (assoc :req-un req-un)
+         req    (assoc :req req)
+         opt-un (assoc :opt-un opt-un)
+         opt    (assoc :opt opt))
+       (keys-impl ns "keys*")))
 
-(s/fdef ns-keys*
-  :args (s/cat :ns symbol? :opts ::ns-keys-opts))
+;; (s/fdef ns-keys*
+;;   :args (s/cat :ns symbol? :opts ::ns-keys-opts))
 
 ;;; ## Helpers
 ;;;
@@ -94,5 +124,4 @@
    returns: function"
   [class]
   #(cc/instance? class %))
-
 
