@@ -9,7 +9,11 @@
 (:clj
  (defmacro if-cljs
    [then else]
-   (if (resolve 'cljs.core/str) then else)))
+   (if (resolve 'cljs.core/str) then else))
+ :clj
+ (defmacro if-cljs
+   [then _]
+   then))
  ;; (if (:ns &env) then else)) ;; no longer works, apparently :/
 
 (def spec-ns (if-cljs "cljs.spec" "clojure.spec"))
