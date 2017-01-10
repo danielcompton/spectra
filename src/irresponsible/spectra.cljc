@@ -56,20 +56,28 @@
 (s/def ::ns-keys-opts (s/keys* :opt-un [::req-un ::req ::opt-un ::opt]))
 
 (defmacro ns-keys
+  "Like {clojure,cljs}.spec/keys, except takes a namespace symbol whose name is
+   used as a prefix to all the unprefixed keys. If the namespace symbol has a namespace
+   it is ignored for convenience when using syntax-quote
+   args: [ns & opts]
+   returns: spec def"
   [ns & opts]
   (let [v (select-keys (conform! ::ns-keys-opts opts) [:req-un :req :opt-un :opt :gen])]
     `(s/keys ~@(mapcat (fn [[k v]]
-                         [k (if (= :gen k) v (mapv #(keyword (name ns) (name %)) v))])
+                         [k (if (= :gen k) v (mapv #(if (namespace %) % (keyword (name ns) (name %))) v))])
                        (sort (seq v))))))
 
 (s/fdef ns-keys
   :args (s/cat :ns symbol? :opts ::ns-keys-opts))
 
 (defmacro ns-keys*
+  "Like ns-keys, but returns a regex spec
+   args: [ns & opts]
+   returns: spec def"
   [ns & opts]
   (let [v (select-keys (conform! ::ns-keys-opts opts) [:req-un :req :opt-un :opt :gen])]
     `(s/keys* ~@(mapcat (fn [[k v]]
-                         [k (if (= :gen k) v (mapv #(keyword (name ns) (name %)) v))])
+                         [k (if (= :gen k) v (mapv #(if (namespace %) % (keyword (name ns) (name %))) v))])
                        (sort (seq v))))))
 
 (s/fdef ns-keys*

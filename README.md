@@ -13,19 +13,36 @@ Status: pre-alpha, be prepared for stuff to break
  (:require [irresponsible.spectra :as ss]
            [#?(:clj clojure.spec :cljs cljs.spec) :as s]))
 
-;; first off, let's demonstrate a sum type
+;;; first off, let's demonstrate a sum type (this OR this)
 
 (s/def ::foo string?)
 (s/def ::bar number?)
 (s/def ::baz (ss/some-spec ::foo ::bar)) ;; => `(s/or ::foo ::foo ::bar ::bar)
 
-(match (ss/conform! ::baz "foo") ;; conform! will throw if conform fails
-  [::foo s] ...  ;; of course, these specs are fully qualified, so you
-  [::bar s] ...) ;; could just pass them off to another function
+;;; we'll use this with conform!, which is like conform but throws with helpful
+;;; info in the metadata when it fails. We use core.match
 
+(let [[k v] (ss/conform! ::baz "foo")]
+  (case k ;; because you just get back the original spec name, you could recurse!
+    ::foo (prn "got a foo" v)
+	::bar (prn "got a bar" v)))
 
-(when (ss/assert! :baz "foo") ;; assert! will also throw on fail, returns input, not conformation
+;;; assert! will also throw on fail, returns input, not conformation
+
+(when (ss/assert! :baz "foo")
   (print "yay!")) ;; assert! can not be disabled like spec/assert can
+
+;; Now something a little bit more exotic
+
+(s/def :fake.json.ns/foo int?)
+(s/def :fake.json.ns/bar string?)
+;;; ns-keys is like clojure.spec/keys, but takes a namespace to apply
+;;; to keywords that do not have a namespace already
+;;; There is a corresponding keys* which returns a regex spec like s/keys*
+(s/def ::json (ss/ns-keys fake.json.ns :opt-un [:foo :bar]))
+
+(def fake-json {:foo 123 :bar ""})
+(assert! ::json fake-json) ;; hooray!
 ```
 
 ## Copyright and License

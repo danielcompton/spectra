@@ -32,10 +32,10 @@
                  ::sentinel)))))
   (t/testing "ns-keys"
     (t/is (= `(s/keys :gen :foo
-                      :opt [:foo/bar :foo/baz]
-                      :opt-un [:foo/bar :foo/baz]
-                      :req [:foo/bar :foo/baz]
-                      :req-un [:foo/bar :foo/baz])
+                      :opt [:foo/bar :bar/baz]
+                      :opt-un [:foo/bar :bar/baz]
+                      :req [:foo/bar :bar/baz]
+                      :req-un [:foo/bar :bar/baz])
              (macroexpand-1 `(ss/ns-keys foo
                                          :req [:bar :bar/baz]
                                          :req-un [:bar :bar/baz]
@@ -43,12 +43,12 @@
                                          :opt-un [:bar :bar/baz]
                                          :garbage :removed
                                          :gen :foo)))))
-  (t/testing "ns-keys"
+  (t/testing "ns-keys*"
     (t/is (= `(s/keys* :gen :foo
-                      :opt [:foo/bar :foo/baz]
-                      :opt-un [:foo/bar :foo/baz]
-                      :req [:foo/bar :foo/baz]
-                      :req-un [:foo/bar :foo/baz])
+                       :opt [:foo/bar :bar/baz]
+                       :opt-un [:foo/bar :bar/baz]
+                       :req [:foo/bar :bar/baz]
+                       :req-un [:foo/bar :bar/baz])
              (macroexpand-1 `(ss/ns-keys* foo
                                          :req [:bar :bar/baz]
                                          :req-un [:bar :bar/baz]
