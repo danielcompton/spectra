@@ -1,6 +1,7 @@
 (ns irresponsible.spectra
-  (:require [#?(:clj clojure.spec :cljs cljs.spec) :as s])
-  (:refer-clojure :as cc :exclude [instance?]))
+  (:require [#?(:clj clojure.core :cljs cljs.core) :as cc]
+            [#?(:clj clojure.spec :cljs cljs.spec) :as s])
+  (:refer-clojure :exclude [instance?]))
 
 (defmacro some-spec
   "Given a list of spec names, constructs an or using the specs as both names and values
@@ -42,38 +43,48 @@
   [spec val]
   (let [r (s/conform spec val)]
     (if (= ::s/invalid r)
-      (throw (ex-info  "Conformation failed failed"
+      (throw (ex-info  "Conformation failed"
                        {:got val :spec spec :spec/form (s/form spec)
                         :explain (s/explain-data spec val) :describe (s/describe spec)}))
       r)))
 
-;; (defn mapify
-;;   ""
-;;   [spec]
-;;   (let [d (s/describe spec)] 
-;;     (match d
-;;       (['cat & items] :seq)
-;;       (let [is (partition 2 items)]
-;;         (map #(match %
-;;                 ([_ (v :guard keyword?)] :seq)
-;;                 {:kind :req-un :name v}
+(s/def ::kw-vec        (s/coll-of keyword? :kind vector?))
+(s/def ::req-un ::kw-vec)
+(s/def ::req    ::kw-vec)
+(s/def ::opt-un ::kw-vec)
+(s/def ::opt    ::kw-vec)
+(s/def ::ns-keys-opts (s/keys* :opt-un [::req-un ::req ::opt-un ::opt]))
 
-;;                 ([k (['? (name :guard keyword?)] :seq)] :seq)
+(defmacro ns-keys
+  [ns & opts]
+  (let [v (select-keys (conform! ::ns-keys-opts opts) [:req-un :req :opt-un :opt :gen])]
+    `(s/keys ~@(mapcat (fn [[k v]]
+                         [k (if (= :gen k) v (mapv #(keyword (name ns) (name %)) v))])
+                       (sort (seq v))))))
 
+(s/fdef ns-keys
+  :args (s/cat :ns symbol? :opts ::ns-keys-opts))
 
+(defmacro ns-keys*
+  [ns & opts]
+  (let [v (select-keys (conform! ::ns-keys-opts opts) [:req-un :req :opt-un :opt :gen])]
+    `(s/keys* ~@(mapcat (fn [[k v]]
+                         [k (if (= :gen k) v (mapv #(keyword (name ns) (name %)) v))])
+                       (sort (seq v))))))
 
-;;                      ([k (['* (name :guard keyword?)] :seq)] :seq)
+(s/fdef ns-keys*
+  :args (s/cat :ns symbol? :opts ::ns-keys-opts))
 
+;;; ## Helpers
+;;;
+;;; Convenience functions for writing specs that are not directly spec-related
+;;;
 
-
-;;                      ([k (['+ (name :guard keyword?)] :seq)] :seq)
-                     
-      ;; :else (throw (ex-info "mapify: expected a 'cat' spec" {:got spec :describe d})))))
-
-
-;;; these are shorthand for definitions
-
-(defn instance? [class]
+(defn instance?
+  "Returns a predicate that checks if the class is an instance of the named class
+   args: [class]
+   returns: function"
+  [class]
   #(cc/instance? class %))
 
 
