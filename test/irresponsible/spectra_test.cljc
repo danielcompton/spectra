@@ -30,6 +30,12 @@
                (ss/conform! ::int 1.23)
                (catch #?(:clj Exception :cljs :default) e
                    ::sentinel)))))
+  (t/testing "ns-defs"
+    (t/is (= `(do (s/def ::foo ::bar)
+                  (s/def :foo/bar ::baz))
+             (macroexpand-1 '(irresponsible.spectra/ns-defs "foo"
+                               ::foo ::bar
+                               :bar ::baz)))))
   (t/testing "only"
     (doseq [pass [{:a 123} {:a 123 :b 456} {:a 123 :b 456 :c 789}]]
       (t/testing pass

@@ -18,6 +18,7 @@
 
 (def spec-ns (if-cljs "cljs.spec.alpha" "clojure.spec.alpha"))
 (def spec-fun #(symbol spec-ns %))
+(def spec-def (spec-fun "def"))
 (def spec-and (spec-fun "and"))
 (def spec-or  (spec-fun "or"))
 
@@ -87,6 +88,12 @@
   (if (namespace kw)
     kw
     (keyword ns (name kw))))
+
+(defmacro ns-defs [ns & defs]
+  (cons 'do
+        (map (fn [[k v]]
+               `(~spec-def ~(maybe-ns ns k) ~v))
+             (partition 2 defs))))
 
 (defn only [& ks]
   (let [s (set ks)]
