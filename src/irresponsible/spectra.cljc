@@ -1,6 +1,6 @@
 (ns irresponsible.spectra
   (:require [#?(:clj clojure.core :cljs cljs.core) :as cc]
-            [#?(:clj clojure.spec :cljs cljs.spec) :as s])
+            [#?(:clj clojure.spec.alpha :cljs cljs.spec.alpha) :as s])
   #?(:cljs
      (:require-macros [irresponsible.spectra :refer [if-cljs spec-ns some-spec ns-keys ns-keys*]]))
   (:refer-clojure :exclude [instance?]))
@@ -16,7 +16,10 @@
    then))
  ;; (if (:ns &env) then else)) ;; no longer works, apparently :/
 
-(def spec-ns (if-cljs "cljs.spec" "clojure.spec"))
+(def spec-ns (if-cljs "cljs.spec.alpha" "clojure.spec.alpha"))
+(def spec-fun #(symbol spec-ns %))
+(def spec-and (spec-fun "and"))
+(def spec-or  (spec-fun "or"))
 
 (defmacro some-spec
   "Given a list of spec names, constructs an or using the specs as both names and values
@@ -28,8 +31,7 @@
   [& specs]
   (when-not (seq specs)
     (throw (ex-info "some-spec: expected at least one spec" {:got specs})))
-  (let [name (symbol spec-ns "or")]
-    `(~name ~@(interleave specs specs))))
+  `(~spec-or ~@(interleave specs specs)))
 
 (s/fdef some-spec
   :args (s/+ keyword?)
@@ -71,17 +73,56 @@
 (s/def ::opt    ::kw-vec)
 ;; (s/def ::ns-keys-opts (s/keys* :opt-un [::req-un ::req ::opt-un ::opt]))
 
-(defn keys-impl [ns spec-mac opts]
-  (letfn [(inner [s]
-            (if (namespace s)
-              s
-              (keyword (name ns) (name s))))
-          (outer [[k v]]
-            (let [v2 (if (= :gen k) v (mapv inner v))]
-              [k v2]))]
-    (let [v (select-keys opts [:req-un :req :opt-un :opt :gen])
-          name (symbol spec-ns spec-mac)]
-      `(~name ~@(mapcat outer (sort (seq v)))))))
+(defn- dens [k]
+  (keyword (name k)))
+
+(defn valid-keys [{:keys [req-un req opt-un opt]}]
+  (-> (sorted-set)
+      (into req)
+      (into opt)
+      (into (map dens req-un))
+      (into (map dens opt-un))))
+
+(defn maybe-ns [ns kw]
+  (if (namespace kw)
+    kw
+    (keyword (name ns) (name kw))))
+
+(defn only [& ks]
+  (let [s (set ks)]
+    #(every? s (keys %))))
+
+(defn- strip-empty [opts]
+  (into (empty opts) (filter (fn [[k v]] (or (not (vector? v)) (seq v)))) opts))
+
+(defn- keys-keys [opts]
+  (-> (if (map? opts)
+        opts
+        (apply sorted-map opts))
+      (select-keys [:req-un :req :opt-un :opt :gen])
+      strip-empty))
+
+(defn ns-kv [ns [k v]]
+  (->> (if (= :gen k)
+         v
+         (mapv (partial maybe-ns ns) v))
+       (vector k)))
+
+(defn keys-impl [spec-fn opts-fn opts]
+  (->> opts keys-keys
+       (mapcat opts-fn)
+       (cons (spec-fun spec-fn))))
+
+(defn ns-keys-impl [ns spec-fn opts]
+  (keys-impl spec-fn (partial ns-kv ns) opts))
+
+(defn only-impl [spec-fn opts-fn opts]
+  `(~spec-and
+    ~(keys-impl spec-fn opts-fn opts)
+    (only ~@(valid-keys opts))))
+
+(defmacro only-keys [& opts]
+  (only-impl "keys" identity opts))
 
 (defmacro ns-keys
   "Like {clojure,cljs}.spec/keys, except takes a namespace symbol whose name is
@@ -89,14 +130,8 @@
    it is ignored for convenience when using syntax-quote
    args: [ns & opts]
    returns: spec def"
-  [ns & {:keys [req-un req opt-un opt gen]}]
-  (->> (cond-> {}
-         gen    (assoc :gen gen)
-         req-un (assoc :req-un req-un)
-         req    (assoc :req req)
-         opt-un (assoc :opt-un opt-un)
-         opt    (assoc :opt opt))
-       (keys-impl ns "keys")))
+  [ns & opts]
+  (ns-keys-impl ns "keys" opts))
 
 ;; (s/fdef ns-keys
 ;;   :args (s/cat :ns symbol? :opts ::ns-keys-opts))
@@ -105,17 +140,17 @@
   "Like ns-keys, but returns a regex spec
    args: [ns & opts]
    returns: spec def"
-  [ns & {:keys [req-un req opt-un opt gen]}]
-  (->> (cond-> {}
-         gen    (assoc :gen gen)
-         req-un (assoc :req-un req-un)
-         req    (assoc :req req)
-         opt-un (assoc :opt-un opt-un)
-         opt    (assoc :opt opt))
-       (keys-impl ns "keys*")))
+  [ns & opts]
+  (ns-keys-impl ns "keys*" opts))
 
 ;; (s/fdef ns-keys*
 ;;   :args (s/cat :ns symbol? :opts ::ns-keys-opts))
+
+(defmacro only-ns-keys  [ns & opts]
+  (only-impl "keys" (partial ns-kv ns) opts))
+
+(defmacro only-ns-keys* [ns & opts]
+  (only-impl "keys*" (partial ns-kv ns) opts))
 
 ;;; ## Helpers
 ;;;

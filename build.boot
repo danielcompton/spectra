@@ -3,8 +3,8 @@
   :version "0.1.0"
   :resource-paths #{"src"}
   :source-paths #{"src"}
-  :dependencies '[[org.clojure/clojure "1.9.0-alpha14"]
-                  [org.clojure/clojurescript "1.9.293" :scope "test"]
+  :dependencies '[[org.clojure/clojure "1.9.0-alpha16"]
+                  [org.clojure/clojurescript "1.9.542" :scope "test"]
                   [adzerk/boot-test        "1.1.2"     :scope "test"]
                   [adzerk/boot-cljs        "1.7.228-1" :scope "test"]
                   [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]])
