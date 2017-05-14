@@ -39,7 +39,7 @@ Status: pre-alpha, be prepared for stuff to break
 ;;; ns-keys is like clojure.spec/keys, but takes a namespace to apply
 ;;; to keywords that do not have a namespace already
 ;;; There is a corresponding keys* which returns a regex spec like s/keys*
-(s/def ::json (ss/ns-keys fake.json.ns :opt-un [:foo :bar]))
+(s/def ::json (ss/ns-keys "fake.json.ns" :opt-un [:foo :bar]))
 
 (def fake-json {:foo 123 :bar ""})
 (assert! ::json fake-json) ;; hooray!

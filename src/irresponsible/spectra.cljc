@@ -86,7 +86,7 @@
 (defn maybe-ns [ns kw]
   (if (namespace kw)
     kw
-    (keyword (name ns) (name kw))))
+    (keyword ns (name kw))))
 
 (defn only [& ks]
   (let [s (set ks)]
@@ -125,7 +125,7 @@
   (only-impl "keys" identity opts))
 
 (defmacro ns-keys
-  "Like {clojure,cljs}.spec/keys, except takes a namespace symbol whose name is
+  "Like {clojure,cljs}.spec/keys, except takes a namespace string which is
    used as a prefix to all the unprefixed keys. If the namespace symbol has a namespace
    it is ignored for convenience when using syntax-quote
    args: [ns & opts]

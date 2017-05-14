@@ -43,7 +43,7 @@
                       :opt-un [:foo/bar :bar/baz]
                       :opt [:foo/bar :bar/baz]
                       :gen :foo)                       
-             (macroexpand-1 '(irresponsible.spectra/ns-keys foo
+             (macroexpand-1 '(irresponsible.spectra/ns-keys "foo"
                                :req [:bar :bar/baz]
                                :req-un [:bar :bar/baz]
                                :opt [:bar :bar/baz]
@@ -56,7 +56,7 @@
                        :opt-un [:foo/bar :bar/baz]
                        :opt [:foo/bar :bar/baz]
                        :gen :foo)                       
-             (macroexpand-1 '(irresponsible.spectra/ns-keys* foo
+             (macroexpand-1 '(irresponsible.spectra/ns-keys* "foo"
                                :req [:bar :bar/baz]
                                :req-un [:bar :bar/baz]
                                :opt [:bar :bar/baz]
@@ -70,7 +70,7 @@
                              :opt [:opt/foo :opt/bar]
                              :gen :foo)
                      (ss/only :bar :foo :opt-bar :opt-foo :req-bar :req-foo :opt/bar :opt/foo))
-             (macroexpand-1 '(irresponsible.spectra/only-ns-keys foo
+             (macroexpand-1 '(irresponsible.spectra/only-ns-keys "foo"
                                :req-un [:req-foo :req-bar]
                                :req [:foo :bar]
                                :opt-un [:opt-foo :opt-bar]
@@ -84,7 +84,7 @@
                               :opt [:opt/foo :opt/bar]
                               :gen :foo)
                      (ss/only :bar :foo :opt-bar :opt-foo :req-bar :req-foo :opt/bar :opt/foo))
-             (macroexpand-1 '(irresponsible.spectra/only-ns-keys* foo
+             (macroexpand-1 '(irresponsible.spectra/only-ns-keys* "foo"
                                :req-un [:req-foo :req-bar]
                                :req [:foo :bar]
                                :opt-un [:opt-foo :opt-bar]
