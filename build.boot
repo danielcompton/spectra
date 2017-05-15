@@ -17,6 +17,13 @@
 (task-options!
  pom {:project (get-env :project)
       :version (get-env :version)}
+ push {:tag true
+       :ensure-branch "master"
+       :ensure-release true
+       :ensure-clean true
+       :gpg-sign true
+       :repo "clojars"
+ }
  target {:dir #{"target"}})
 
 (deftask testing []
