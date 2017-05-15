@@ -41,7 +41,7 @@
 ;; Travis Only stuff
 (deftask travis []
   (testing)
-  (comp (t/test) (make-jar)))
+  (comp (t/test) (test-cljs) (make-jar)))
 
 (deftask travis-installdeps []
   (testing) identity)
