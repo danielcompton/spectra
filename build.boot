@@ -2,7 +2,7 @@
 (set-env!
   :project 'irresponsible/spectra
   :version "0.1.0"
-  :resource-paths #{"src"}
+  :resource-paths #{"src" "resources"}
   :source-paths #{"src"}
   :dependencies '[[org.clojure/clojure "1.9.0-alpha16"]
                   [org.clojure/clojurescript "1.9.542" :scope "test"]
