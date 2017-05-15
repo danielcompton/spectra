@@ -4,7 +4,7 @@
   :version "0.1.0"
   :resource-paths #{"src" "resources"}
   :source-paths #{"src"}
-  :dependencies '[[org.clojure/clojure "1.9.0-alpha16"]
+  :dependencies '[[org.clojure/clojure "1.9.0-alpha16" :scope "provided"]
                   [org.clojure/clojurescript "1.9.542" :scope "test"]
                   [adzerk/boot-test        "1.1.2"     :scope "test"]
                   [adzerk/boot-cljs        "1.7.228-1" :scope "test"]
