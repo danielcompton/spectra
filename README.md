@@ -14,6 +14,8 @@ common cases I've tripped over.
 
 ## Usage
 
+If you're using clojure 1.8, you will need [clojure-future-spec](https://github.com/tonsky/clojure-future-spec)
+
 ```clojure
 (ns my.ns
  (:require [irresponsible.spectra :as ss]
