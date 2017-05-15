@@ -2,7 +2,7 @@
   (:require [#?(:clj clojure.core :cljs cljs.core) :as cc]
             [#?(:clj clojure.spec.alpha :cljs cljs.spec.alpha) :as s])
   #?(:cljs
-     (:require-macros [irresponsible.spectra :refer [if-cljs spec-ns some-spec ns-keys ns-keys*]]))
+     (:require-macros [irresponsible.spectra :refer [if-cljs spec-ns some-spec only-keys ns-keys ns-keys* only-ns-keys only-ns-keys*]]))
   (:refer-clojure :exclude [instance?]))
 
 #?
