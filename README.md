@@ -2,9 +2,15 @@ The irresponsible clojure guild presents...
 
 # Spectra
 
-Some tools for working with specs (clj/s)
+The missing toolkit for clojure.spec/cljs.spec
 
-Status: pre-alpha, be prepared for stuff to break
+Status: new, but we're using it without problems
+
+## Rationale
+
+Using spec to get the guarantees you want of your code often requires
+much boilerplate. This library removes that boilerplate for a few
+common cases I've tripped over.
 
 ## Usage
 
@@ -12,8 +18,6 @@ Status: pre-alpha, be prepared for stuff to break
 (ns my.ns
  (:require [irresponsible.spectra :as ss]
            [#?(:clj clojure.spec :cljs cljs.spec) :as s]))
-
-;;; first off, let's demonstrate a sum type (this OR this)
 
 (s/def ::foo string?)
 (s/def ::bar number?)
@@ -32,17 +36,29 @@ Status: pre-alpha, be prepared for stuff to break
 (when (ss/assert! :baz "foo")
   (print "yay!")) ;; assert! can not be disabled like spec/assert can
 
-;; Now something a little bit more exotic
+;; Now I'll show you how spectra makes using spec with json less painful!
+;; Firstly, we can use a fake namespace to represent the json
+;; ns-defs will prepend the given namespace to keywords that don't have them
 
-(s/def :fake.json.ns/foo int?)
-(s/def :fake.json.ns/bar string?)
+(ss/ns-defs "fake.json.ns"
+  :foo integer?
+  :bar string?) ; => (do (s/def :fake.json.ns/foo integer?) (s/def :fake.json.ns/bar string?))
+
 ;;; ns-keys is like clojure.spec/keys, but takes a namespace to apply
 ;;; to keywords that do not have a namespace already
 ;;; There is a corresponding keys* which returns a regex spec like s/keys*
 (s/def ::json (ss/ns-keys "fake.json.ns" :opt-un [:foo :bar]))
 
+;; now we can use it!
 (def fake-json {:foo 123 :bar ""})
-(assert! ::json fake-json) ;; hooray!
+(ss/assert! ::json fake-json) ;; hooray!
+
+;; ::json2 is like ::json, except it will not permit unrecognised keys
+;; there is also `only-ns-keys*` if you require a regex spec be returned
+(s/def ::json2 (ss/only-ns-keys "fake.json.ns" :opt-un [:foo :bar]))
+
+;; we can also have this 'only' functionality without specifying specs for the keys
+(s/def ::my-map (ss/only :a :b :c)) ;; accepts {} but not {:a 1 :b 2 :c 3 :d 4}
 ```
 
 ## Copyright and License
