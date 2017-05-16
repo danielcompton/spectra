@@ -1,3 +1,5 @@
+[![Clojars Project](https://img.shields.io/clojars/v/irresponsible/spectra.svg)](https://clojars.org/irresponsible/spectra)
+
 The irresponsible clojure guild presents...
 
 # Spectra
