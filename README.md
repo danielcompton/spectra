@@ -21,7 +21,7 @@ If you're using clojure 1.8, you will need [clojure-future-spec](https://github.
 ```clojure
 (ns my.ns
  (:require [irresponsible.spectra :as ss]
-           [#?(:clj clojure.spec :cljs cljs.spec) :as s]))
+           [#?(:clj clojure.spec.alpha :cljs cljs.spec.alpha) :as s]))
 
 (s/def ::foo string?)
 (s/def ::bar number?)
