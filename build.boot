@@ -2,9 +2,9 @@
 (set-env! :dependencies (cond
   (= "1.8.0" (System/getenv "BOOT_CLOJURE_VERSION"))
     '[[org.clojure/clojure "1.8.0" :scope "provided"]
-      [clojure-future-spec "1.9.0-alpha16-1"]]
+      [clojure-future-spec "1.9.0-alpha17"]]
   :else
-    '[[org.clojure/clojure "1.9.0-alpha16" :scope "provided"]]))
+    '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]]))
 
 (set-env!
   :project 'irresponsible/spectra
