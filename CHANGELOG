@@ -1,2 +1,5 @@
+v0.1.1 - 7 July 2017
+- Move from clojure.spec to clojure.spec.alpha
+
 v0.1.0 - 15 May 2017
 - First Release
