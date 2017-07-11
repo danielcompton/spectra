@@ -1,4 +1,5 @@
 [![Clojars Project](https://img.shields.io/clojars/v/irresponsible/spectra.svg)](https://clojars.org/irresponsible/spectra)
+[![Build Status](https://travis-ci.org/irresponsible/spectra.svg?branch=master)](https://travis-ci.org/irresponsible/spectra)
 
 The irresponsible clojure guild presents...
 
