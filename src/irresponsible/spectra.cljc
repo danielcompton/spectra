@@ -131,6 +131,9 @@
 (defmacro only-keys [& opts]
   (only-impl "keys" identity opts))
 
+(defmacro only-keys* [& opts]
+  (only-impl "keys*" identity opts))
+
 (defmacro ns-keys
   "Like {clojure,cljs}.spec/keys, except takes a namespace string which is
    used as a prefix to all the unprefixed keys. If the namespace symbol has a namespace
@@ -158,6 +161,15 @@
 
 (defmacro only-ns-keys* [ns & opts]
   (only-impl "keys*" (partial ns-kv ns) opts))
+
+;;; ## Handy macros
+
+(defmacro within-ns [ns & exprs]
+  `(let [old-ns# *ns*]
+     (try (in-ns '~ns)
+          ~@exprs
+          (finally
+            (in-ns 'old-ns#)))))
 
 ;;; ## Helpers
 ;;;

@@ -8,7 +8,7 @@
 
 (set-env!
   :project 'irresponsible/spectra
-  :version "0.1.1"
+  :version "0.2.0"
   :resource-paths #{"src" "resources"}
   :source-paths #{"src"}
   :repositories #(conj % ["clojars" {:url "https://clojars.org/repo/"}])
