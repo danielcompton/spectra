@@ -22,14 +22,15 @@
 
 (task-options!
  pom {:project (get-env :project)
-      :version (get-env :version)}
+      :version (get-env :version)
+      :url "https://github.com/irresponsible/spectra"
+      :scm {:url "https://github.com/irresponsible/spectra"}}
  push {:tag true
        :ensure-branch "master"
        :ensure-release true
        :ensure-clean true
        :gpg-sign true
-       :repo "clojars"
- }
+       :repo "clojars"}
  target {:dir #{"target"}})
 
 (deftask testing []
