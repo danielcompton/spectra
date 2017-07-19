@@ -23,6 +23,7 @@
 (task-options!
  pom {:project (get-env :project)
       :version (get-env :version)
+      :description "The missing toolkit for clojure.spec/cljs.spec"
       :url "https://github.com/irresponsible/spectra"
       :scm {:url "https://github.com/irresponsible/spectra"}
       :license {"MIT" "https://en.wikipedia.org/MIT_License"}}
