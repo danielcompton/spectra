@@ -11,7 +11,6 @@
   :version "0.2.2"
   :resource-paths #{"src" "resources"}
   :source-paths #{"src"}
-  :repositories #(conj % ["clojars" {:url "https://clojars.org/repo/"}])
   :dependencies #(into % '[[org.clojure/clojurescript "1.9.671" :scope "test"]
                            [adzerk/boot-test        "1.2.0"     :scope "test"]
                            [adzerk/boot-cljs        "2.0.0"     :scope "test"]
