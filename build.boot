@@ -24,7 +24,8 @@
  pom {:project (get-env :project)
       :version (get-env :version)
       :url "https://github.com/irresponsible/spectra"
-      :scm {:url "https://github.com/irresponsible/spectra"}}
+      :scm {:url "https://github.com/irresponsible/spectra"}
+      :license {"MIT" "https://en.wikipedia.org/MIT_License"}}
  push {:tag true
        :ensure-branch "master"
        :ensure-release true
