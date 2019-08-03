@@ -1,4 +1,5 @@
 [![Clojars Project](https://img.shields.io/clojars/v/irresponsible/spectra.svg)](https://clojars.org/irresponsible/spectra)
+[![cljdoc badge](https://cljdoc.org/badge/irresponsible/spectra)](https://cljdoc.org/d/irresponsible/spectra)
 [![Jitpack Project](https://jitpack.io/v/irresponsible/spectra.svg)](https://jitpack.io/#irresponsible/spectra)
 [![Build Status](https://travis-ci.org/irresponsible/spectra.svg?branch=master)](https://travis-ci.org/irresponsible/spectra)
 
